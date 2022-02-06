@@ -5,10 +5,9 @@ import { connect } from 'react-redux';
 const K_WIDTH = 50;
 const K_HEIGHT = 40;
 
-const MaybankHQ = ({ text }) => <div style={{color:'black'}}>{text}</div>;
-const Marker = ({ text }) => <div style={{width: K_WIDTH,
-  height: K_HEIGHT,
+const Marker = ({ text }) => <div style={{
   width: K_WIDTH,
+  height: K_HEIGHT,
   left: -K_WIDTH / 2,
   top: -K_HEIGHT / 2,
   border: '5px solid #f44336',

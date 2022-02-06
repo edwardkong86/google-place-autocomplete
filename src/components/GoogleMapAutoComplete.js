@@ -7,7 +7,7 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import {
   setSelected
 } from '../stores/placeSearchSlice'
@@ -147,7 +147,7 @@ export default function GoogleMaps() {
         onChange={(event, newValue, reason) => {
             setOptions(newValue ? [newValue, ...options] : options);
             setValue(newValue);
-            if(reason == 'clear'){
+            if(reason === 'clear'){
                 dispatch(setSelected(null))
             }
         }}
