@@ -7,9 +7,10 @@ import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import parse from 'autosuggest-highlight/parse';
 import throttle from 'lodash/throttle';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import {
-  setSelected
+  setSelected,
+  selectHistories
 } from '../stores/placeSearchSlice'
 
 // This key was created specifically for the demo in mui.com.
@@ -31,8 +32,9 @@ const autocompleteService = { current: null };
 const placeService = { current: null };
 
 export default function GoogleMaps() {
-    const dispatch = useDispatch()
-    
+  const dispatch = useDispatch();
+  const histories = useSelector(selectHistories);
+
   const [value, setValue] = React.useState(null);
   const [inputValue, setInputValue] = React.useState('');
   const [options, setOptions] = React.useState([]);
@@ -78,12 +80,11 @@ export default function GoogleMaps() {
     }
 
     if (inputValue === '') {
-      setOptions(value ? [value] : []);
+      setOptions([...histories, ...(value ? [value] : [])]);
       return undefined;
     }
 
     fetch({ input: inputValue }, (results) => {
-        console.log(results);
       if (active) {
         let newOptions = [];
 
@@ -95,7 +96,7 @@ export default function GoogleMaps() {
           newOptions = [...newOptions, ...results];
         }
 
-        setOptions(newOptions);
+        setOptions([...histories, ...newOptions]);
       }
     });
 
@@ -118,9 +119,8 @@ export default function GoogleMaps() {
         return undefined;
       }
         fetchPlace({ placeId: value.place_id }, (placeObject) => {
-            console.log(placeObject);
           if (active) {
-            dispatch(setSelected({placeName: placeObject.name, placeAddress: placeObject.formatted_address, lat: placeObject.geometry.location.lat(), lng: placeObject.geometry.location.lng(), icon: placeObject.icon}))
+            dispatch(setSelected({...value, placeName: placeObject.name, placeAddress: placeObject.formatted_address, lat: placeObject.geometry.location.lat(), lng: placeObject.geometry.location.lng(), icon: placeObject.icon}))
             }
         });
       }
@@ -144,6 +144,7 @@ export default function GoogleMaps() {
         includeInputInList
         filterSelectedOptions
         value={value}
+        groupBy={(option) => option.history ? "Recently Search" : "Suggestion"}
         onChange={(event, newValue, reason) => {
             setOptions(newValue ? [newValue, ...options] : options);
             setValue(newValue);
@@ -152,7 +153,7 @@ export default function GoogleMaps() {
             }
         }}
         onInputChange={(event, newInputValue) => {
-            setInputValue(newInputValue);
+          setInputValue(newInputValue);
         }}
         renderInput={(params) => (
             <TextField {...params} label="Search your location" fullWidth />
